@@ -1,0 +1,22 @@
+# Install dependencies
+
+```
+# Python3
+conda install -c anaconda flask
+conda install -c anaconda psycopg2
+conda install -c anaconda pandas
+conda install -c plotly plotly
+```
+
+# Run it
+
+```
+cd bibp_vis
+FLASK_APP=vis.py flask run
+# For debugging purposes, run
+# FLASK_ENV=development FLASK_APP=vis.py flask run --host=0.0.0.0 --port=10101
+```
+
+For the current version, see
+
+http://hpcana04.ghdna.io:10101/
