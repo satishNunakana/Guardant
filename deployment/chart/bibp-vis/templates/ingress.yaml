@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  labels:
+    app: {{ .Release.Name }}-bibp
+    chart: {{ .Chart.Name }}
+    heritage: {{ .Release.Service }}
+    release:  {{ .Release.Name }}
+  name: {{ .Release.Name }}-ingress
+  namespace: {{ .Values.global.namespace }}
+spec:
+  rules:
+  - host: {{ .Release.Name }}.{{ .Values.global.Host }}
+    http:
+      paths:
+      - backend:
+          serviceName: {{ .Release.Name }}-bibp
+          servicePort: {{ .Values.bibp_vis.service.service_port }}
+        path: /

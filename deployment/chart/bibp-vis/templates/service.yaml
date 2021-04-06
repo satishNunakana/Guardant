@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Release.Name }}-bibp
+    chart: {{ .Chart.Name }}
+    heritage: {{ .Release.Service }}
+    release:  {{ .Release.Name }}
+  name: {{ .Release.Name }}-bibp
+  namespace: {{ .Values.global.namespace }}
+spec:
+  ports:
+  - name: web
+    port: {{ .Values.bibp_vis.service.service_port }}
+    protocol: TCP
+    targetPort: {{ .Values.bibp_vis.service.container_port }}
+  selector:
+    app: {{ .Release.Name }}-bibp
+    chart: {{ .Chart.Name }}
+    heritage: {{ .Release.Service }}
+    release:  {{ .Release.Name }}
+  type: {{ .Values.bibp_vis.service.type }}

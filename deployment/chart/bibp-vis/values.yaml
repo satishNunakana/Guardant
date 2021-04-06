@@ -1,0 +1,76 @@
+global:
+
+  ## Define a namespace where the bibp_vis release will be deployed
+  namespace: development
+
+  #Host Domain : Choose "bik8s.gh-bisre.com" if you are deploying in Amazon EKS
+  # Choose "mercury.k8s.bi.ghdna.io" if you are deploying in Mercury Kubernetes Cluster
+  Host: "mercury.k8s.bi.ghdna.io"
+
+  ## imagePullSecrets Refers to Artifactory Credentials ( Secret ) required to pull an image from
+  ## the artifactory. A Secret is already deployed in development namespace.
+  ## Make sure to deploy a secret if chart deployment is on a different namespace
+  imagePullSecrets: "artifactory-regcred"
+
+
+bibp_vis:
+
+  replicas: 1
+
+  ## Docker image is deployed in our Jfrog Artifactory
+  ##
+  repository: docker.artifactory01.ghdna.io/bibp_vis/master
+  tag: latest
+
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: Always
+
+  environment:
+    FLASK_APP=vis.py
+    FLASK_ENV=production
+
+  ## Pod Security Context - Currently Chart Does Not Support this
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  securityContext:
+    enabled: true
+    fsGroup: 750
+    runAsUser: 31546
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+
+  # Define Resource Requests and Limits
+  resources: {}
+    # requests:
+    #   memory: "100Mi"
+    #   cpu: "100m"
+    # limits:
+    #   memory: "1Gi"
+    #   cpu: "1"
+
+  persistence:
+    enabled: false
+    ## A manually managed Persistent Volume and Claim
+    ## If defined, PVC must be created manually before volume will be bound
+    ## The value is evaluated as a template, so, for example, the name can depend on .Release or .Chart
+    ##
+    ## existingClaim: "bibp_vis_data00"
+
+    ## The path the volume will be mounted at
+    ##
+    ## Define Mount Paths for Media and Clinical_ops Directories
+    ## mountpath: /data
+
+  service:
+
+    ## Redis service type
+    ## Cluster IP: Assigns a IP address that is only accessible from the kubernetes cluster
+    type: ClusterIP
+
+    # Service Default Ports
+    ## Service_port refers to Kubernetes Service and container_port refers to Container
+    container_port: 5000
+    service_port: 5000

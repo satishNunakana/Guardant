@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Release.Name }}-bibp
+    chart: {{ .Chart.Name }}
+    heritage: {{ .Release.Service }}
+    release:  {{ .Release.Name }}
+  name: {{ .Release.Name }}-bibp
+  namespace: {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.bibp_vis.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-bibp
+      chart: {{ .Chart.Name }}
+      heritage: {{ .Release.Service }}
+      release:  {{ .Release.Name }}
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-bibp
+        chart: {{ .Chart.Name }}
+        heritage: {{ .Release.Service }}
+        release:  {{ .Release.Name }}
+    spec:
+      {{- if .Values.bibp_vis.securityContext.enabled }}
+      securityContext:
+        fsGroup: {{ .Values.bibp_vis.securityContext.fsGroup }}
+      {{- end }}
+      containers:
+      - env:
+        - name: FLASK_APP
+          value: vis.py
+        - name: FLASK_ENV
+          value: development
+        image: {{ .Values.bibp_vis.repository }}:{{ .Values.bibp_vis.tag }}
+        name: bibp-vis
+        imagePullPolicy: {{ .Values.bibp_vis.pullPolicy }}
+        command:
+        - flask
+        - run
+        - -h
+        - 0.0.0.0
+        resources:
+{{ toYaml .Values.bibp_vis.resources | indent 10 }}
+        {{- if .Values.bibp_vis.securityContext.enabled }}
+        securityContext:
+          runAsUser: {{ .Values.bibp_vis.securityContext.runAsUser }}
+          runAsNonRoot: {{ .Values.bibp_vis.securityContext.runAsNonRoot }}
+          allowPrivilegeEscalation: {{ .Values.bibp_vis.securityContext.allowPrivilegeEscalation }}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.bibp_vis.service.container_port }}
+      imagePullSecrets:
+      - name: {{ .Values.global.imagePullSecrets }}
